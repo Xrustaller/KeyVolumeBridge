@@ -1,3 +1,5 @@
+using KeyVolumeBridge.UI;
+
 namespace KeyVolumeBridge;
 
 internal static class Program

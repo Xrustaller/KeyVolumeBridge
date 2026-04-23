@@ -9,6 +9,9 @@
         <Prefer32Bit>false</Prefer32Bit>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Title>KeyVolumeBridge</Title>
+        <Authors>Xrustaller</Authors>
+        <RepositoryUrl>https://github.com/Xrustaller/KeyVolumeBridge</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>

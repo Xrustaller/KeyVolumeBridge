@@ -5,7 +5,7 @@ using KeyVolumeBridge.Processing;
 using KeyVolumeBridge.Reaper;
 using Microsoft.Win32;
 
-namespace KeyVolumeBridge;
+namespace KeyVolumeBridge.UI;
 
 internal sealed class TrayApplicationContext : ApplicationContext
 {
