@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Globalization;
 
 namespace KeyVolumeBridge.Config;
 
@@ -83,13 +85,13 @@ internal sealed class AppConfig
             },
             Commands = new CommandConfig
             {
-                VolumeUp = 40108,
-                VolumeDown = 40107,
+                VolumeUp = "40108",
+                VolumeDown = "40107",
                 Mute = new MuteCommandConfig
                 {
-                    SingleClick = 40730,
-                    DoubleClickExtra = 0,
-                    TripleClickExtra = 0
+                    SingleClick = "40730",
+                    DoubleClickExtra = "",
+                    TripleClickExtra = ""
                 }
             },
             Click = new ClickConfig
@@ -121,9 +123,15 @@ internal sealed class AppConfig
         Commands.Mute.TripleClickExtra = NormalizeCommandId(Commands.Mute.TripleClickExtra);
     }
 
-    private static int NormalizeCommandId(int value)
+    private static string NormalizeCommandId(string? value)
     {
-        return value < 0 ? 0 : value;
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+
+        string trimmed = value.Trim();
+        if (int.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out int numeric))
+            return numeric <= 0 ? string.Empty : numeric.ToString(CultureInfo.InvariantCulture);
+
+        return trimmed;
     }
 }
 
@@ -135,19 +143,43 @@ internal sealed class OscConfig
 
 internal sealed class CommandConfig
 {
-    public int VolumeUp { get; set; } = 40108;
-    public int VolumeDown { get; set; } = 40107;
+    [JsonConverter(typeof(StringOrNumberToStringJsonConverter))]
+    public string VolumeUp { get; set; } = "40108";
+    [JsonConverter(typeof(StringOrNumberToStringJsonConverter))]
+    public string VolumeDown { get; set; } = "40107";
     public MuteCommandConfig Mute { get; set; } = new();
 }
 
 internal sealed class MuteCommandConfig
 {
-    public int SingleClick { get; set; } = 40730;
-    public int DoubleClickExtra { get; set; }
-    public int TripleClickExtra { get; set; }
+    [JsonConverter(typeof(StringOrNumberToStringJsonConverter))]
+    public string SingleClick { get; set; } = "40730";
+    [JsonConverter(typeof(StringOrNumberToStringJsonConverter))]
+    public string DoubleClickExtra { get; set; } = string.Empty;
+    [JsonConverter(typeof(StringOrNumberToStringJsonConverter))]
+    public string TripleClickExtra { get; set; } = string.Empty;
 }
 
 internal sealed class ClickConfig
 {
     public int MuteWindowMs { get; set; } = 325;
+}
+
+internal sealed class StringOrNumberToStringJsonConverter : JsonConverter<string>
+{
+    public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return reader.TokenType switch
+        {
+            JsonTokenType.String => reader.GetString() ?? string.Empty,
+            JsonTokenType.Number => JsonElement.ParseValue(ref reader).ToString(),
+            JsonTokenType.Null => string.Empty,
+            _ => throw new JsonException("Ожидалась строка или число для command id.")
+        };
+    }
+
+    public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value);
+    }
 }

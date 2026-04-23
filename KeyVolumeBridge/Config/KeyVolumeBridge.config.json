@@ -1,14 +1,14 @@
 {
   "osc": {
     "host": "127.0.0.1",
-    "port": 8000
+    "port": 9009
   },
   "commands": {
-    "volumeUp": 40108,
-    "volumeDown": 40107,
+    "volumeUp": "_RSea2233aeff6aeb00255753d85acde35edb67a619",
+    "volumeDown": "_RS155edfab25d6dcc8f511e038ba3f144cc4f5b769",
     "mute": {
-      "singleClick": 40730,
-      "doubleClickExtra": 0,
+      "singleClick": "_RS2fbf18614fbb7ea89544989f55bd1adbfbc13179",
+      "doubleClickExtra": "_RSc58969886bdd8136c44bc742858d092970510531",
       "tripleClickExtra": 0
     }
   },

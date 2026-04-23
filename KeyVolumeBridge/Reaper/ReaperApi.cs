@@ -46,13 +46,14 @@ internal sealed class ReaperApi : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public void Main_OnCommand(int commandId)
+    public void Main_OnCommand(string? commandId)
     {
-        if (commandId <= 0) return;
+        string normalizedCommandId = NormalizeCommandId(commandId);
+        if (string.IsNullOrEmpty(normalizedCommandId)) return;
 
         if (!IsReaperRunning()) return;
 
-        byte[] payload = BuildOscActionMessage(commandId);
+        byte[] payload = BuildOscActionMessage(normalizedCommandId);
         lock (_sendSync)
         {
             if (_disposed) return;
@@ -136,7 +137,7 @@ internal sealed class ReaperApi : IDisposable
         }
     }
 
-    private static byte[] BuildOscActionMessage(int commandId)
+    private static byte[] BuildOscActionMessage(string commandId)
     {
         // Для REAPER action-триггера используем путь /action/<id> без аргументов.
         // По спецификации OSC даже без аргументов добавляем type tags строку ",".
@@ -163,5 +164,10 @@ internal sealed class ReaperApi : IDisposable
     private static int Align4(int value)
     {
         return (value + 3) & ~3;
+    }
+
+    private static string NormalizeCommandId(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
     }
 }

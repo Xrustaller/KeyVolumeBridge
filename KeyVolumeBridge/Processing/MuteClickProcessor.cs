@@ -6,12 +6,12 @@ namespace KeyVolumeBridge.Processing;
 internal sealed class MuteClickProcessor : IDisposable
 {
     private readonly int _clickWindowMs;
-    private readonly int _doubleClickExtraCommandId;
+    private readonly string _doubleClickExtraCommandId;
     private readonly Action<string>? _log;
     private readonly ReaperApi _reaperApi;
-    private readonly int _singleClickCommandId;
+    private readonly string _singleClickCommandId;
     private readonly object _sync = new();
-    private readonly int _tripleClickExtraCommandId;
+    private readonly string _tripleClickExtraCommandId;
     private int _clickCount;
     private bool _disposed;
 
@@ -19,9 +19,9 @@ internal sealed class MuteClickProcessor : IDisposable
 
     public MuteClickProcessor(
         ReaperApi reaperApi,
-        int singleClickCommandId,
-        int doubleClickExtraCommandId,
-        int tripleClickExtraCommandId,
+        string singleClickCommandId,
+        string doubleClickExtraCommandId,
+        string tripleClickExtraCommandId,
         int clickWindowMs,
         Action<string>? log = null)
     {
@@ -92,15 +92,16 @@ internal sealed class MuteClickProcessor : IDisposable
         if (resolvedClicks == 1) SendCommand(_singleClickCommandId, "Mute x1");
     }
 
-    private void SendCommand(int commandId, string source)
+    private void SendCommand(string? commandId, string source)
     {
-        if (commandId <= 0)
+        string normalizedCommandId = string.IsNullOrWhiteSpace(commandId) ? string.Empty : commandId.Trim();
+        if (string.IsNullOrEmpty(normalizedCommandId))
         {
-            _log?.Invoke($"{source}: extra command не задан (ID={commandId})");
+            _log?.Invoke($"{source}: extra command не задан");
             return;
         }
 
-        _log?.Invoke($"{source}, REAPER Command ID: {commandId}");
-        _reaperApi.Main_OnCommand(commandId);
+        _log?.Invoke($"{source}, REAPER Command ID: {normalizedCommandId}");
+        _reaperApi.Main_OnCommand(normalizedCommandId);
     }
 }

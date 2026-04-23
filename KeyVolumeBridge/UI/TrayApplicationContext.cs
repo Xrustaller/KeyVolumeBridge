@@ -14,12 +14,13 @@ internal sealed class TrayApplicationContext : ApplicationContext
     private const string StartupRunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string StartupValueName = "KeyVolumeBridge";
 
-    private readonly AppConfig _config;
+    private AppConfig _config;
     private readonly ToolStripMenuItem _configItem;
     private readonly ToolStripMenuItem _lastEventItem;
     private readonly NotifyIcon _notifyIcon;
     private readonly ToolStripMenuItem _oscItem;
     private readonly bool _ownsTrayIcon;
+    private readonly ToolStripMenuItem _reloadConfigItem;
     private readonly ToolStripMenuItem _startupItem;
     private readonly ToolStripMenuItem _statusItem;
 
@@ -36,10 +37,12 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
         _statusItem = new ToolStripMenuItem("Статус: инициализация...") { Enabled = false };
         _oscItem = new ToolStripMenuItem("OSC: -") { Enabled = false };
+        _reloadConfigItem = new ToolStripMenuItem("Обновить конфиг");
         _configItem = new ToolStripMenuItem("Открыть папку конфига");
         _startupItem = new ToolStripMenuItem("Запускать при старте Windows") { CheckOnClick = false };
         _lastEventItem = new ToolStripMenuItem("Последнее событие: -") { Enabled = false };
 
+        _reloadConfigItem.Click += (_, _) => ReloadConfig();
         _configItem.Click += (_, _) => OpenConfigFolder();
         _startupItem.Click += (_, _) => ToggleStartup();
 
@@ -53,6 +56,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(_startupItem);
         menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(_reloadConfigItem);
         menu.Items.Add(_configItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(exitItem);
@@ -76,6 +80,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
         try
         {
+            StopRuntime();
+
             _reaperApi = new ReaperApi(_config.Osc.Host, _config.Osc.Port, LogFromAnyThread);
             _muteClickProcessor = new MuteClickProcessor(
                 _reaperApi,
@@ -103,6 +109,20 @@ internal sealed class TrayApplicationContext : ApplicationContext
         }
     }
 
+    private void ReloadConfig()
+    {
+        try
+        {
+            _config = AppConfig.Load();
+            InitializeRuntime();
+            UpdateLastEvent("Конфиг обновлён.");
+        }
+        catch (Exception ex)
+        {
+            UpdateLastEvent($"Не удалось обновить конфиг: {ex.Message}");
+        }
+    }
+
     private void OnMediaKeyPressed(MediaKey key)
     {
         if (_reaperApi == null) return;
@@ -114,14 +134,14 @@ internal sealed class TrayApplicationContext : ApplicationContext
             return;
         }
 
-        int commandId = key switch
+        string commandId = key switch
         {
             MediaKey.VolumeUp => _config.Commands.VolumeUp,
             MediaKey.VolumeDown => _config.Commands.VolumeDown,
-            _ => 0
+            _ => string.Empty
         };
 
-        if (commandId <= 0)
+        if (string.IsNullOrWhiteSpace(commandId))
         {
             UpdateLastEvent($"Key: {key}, команда не задана");
             return;
@@ -244,7 +264,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         return (SystemIcons.Application, false);
     }
 
-    protected override void ExitThreadCore()
+    private void StopRuntime()
     {
         _hook?.Dispose();
         _hook = null;
@@ -254,6 +274,11 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
         _reaperApi?.Dispose();
         _reaperApi = null;
+    }
+
+    protected override void ExitThreadCore()
+    {
+        StopRuntime();
 
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();

@@ -4,6 +4,7 @@
 out/
 artifacts/
 publish/
+installer-output/
 
 # NuGet
 *.nupkg

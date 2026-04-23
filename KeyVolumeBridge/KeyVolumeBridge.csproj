@@ -12,6 +12,7 @@
         <Title>KeyVolumeBridge</Title>
         <Authors>Xrustaller</Authors>
         <RepositoryUrl>https://github.com/Xrustaller/KeyVolumeBridge</RepositoryUrl>
+        <Version>1.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
