@@ -1,0 +1,18 @@
+{
+  "osc": {
+    "host": "127.0.0.1",
+    "port": 8000
+  },
+  "commands": {
+    "volumeUp": 40108,
+    "volumeDown": 40107,
+    "mute": {
+      "singleClick": 40730,
+      "doubleClickExtra": 0,
+      "tripleClickExtra": 0
+    }
+  },
+  "click": {
+    "muteWindowMs": 325
+  }
+}

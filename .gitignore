@@ -1,0 +1,56 @@
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+out/
+artifacts/
+publish/
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# Logs and diagnostics
+*.log
+*.tlog
+*.pid
+*.svclog
+
+# Test and coverage outputs
+TestResult*/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+
+# JetBrains Rider / IntelliJ
+.idea/
+*.iml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings
+
+# Profilers / analyzers
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# OS files
+.DS_Store
+Thumbs.db

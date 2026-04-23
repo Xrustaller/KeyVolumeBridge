@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyVolumeBridge", "KeyVolumeBridge\KeyVolumeBridge.csproj", "{BDD6F44A-57EE-44DD-9C65-3832A093E92A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BDD6F44A-57EE-44DD-9C65-3832A093E92A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDD6F44A-57EE-44DD-9C65-3832A093E92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDD6F44A-57EE-44DD-9C65-3832A093E92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDD6F44A-57EE-44DD-9C65-3832A093E92A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
