@@ -77,15 +77,13 @@ internal sealed class MuteClickProcessor : IDisposable
 
         if (resolvedClicks >= 3)
         {
-            SendCommand(_singleClickCommandId, "Mute x3 base");
-            SendCommand(_tripleClickExtraCommandId, "Mute x3 extra");
+            SendCommand(_tripleClickExtraCommandId, "Mute x3");
             return;
         }
 
         if (resolvedClicks == 2)
         {
-            SendCommand(_singleClickCommandId, "Mute x2 base");
-            SendCommand(_doubleClickExtraCommandId, "Mute x2 extra");
+            SendCommand(_doubleClickExtraCommandId, "Mute x2");
             return;
         }
 
@@ -97,7 +95,7 @@ internal sealed class MuteClickProcessor : IDisposable
         string normalizedCommandId = string.IsNullOrWhiteSpace(commandId) ? string.Empty : commandId.Trim();
         if (string.IsNullOrEmpty(normalizedCommandId))
         {
-            _log?.Invoke($"{source}: extra command не задан");
+            _log?.Invoke($"{source}: команда не задана");
             return;
         }
 
