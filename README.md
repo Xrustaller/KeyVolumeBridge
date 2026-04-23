@@ -1,0 +1,127 @@
+# KeyVolumeBridge
+
+Лёгкое Windows-приложение в трее, которое перехватывает аппаратные медиа-клавиши громкости и отправляет команды в **REAPER** через **OSC**.
+
+## Что делает
+
+- Глобально перехватывает:
+  - `Volume Up`
+  - `Volume Down`
+  - `Volume Mute`
+- Блокирует стандартную реакцию Windows на эти клавиши (системная громкость не меняется).
+- Отправляет в REAPER OSC-команды вида `/action/<commandId>`.
+- Работает в фоне через иконку в системном трее (без консоли).
+- Поддерживает:
+  - одиночный клик `Mute`
+  - двойной клик `Mute` (доп. команда)
+  - тройной клик `Mute` (доп. команда)
+- Имеет переключатель **автозапуска Windows** прямо в меню трея.
+
+## Технологии
+
+- .NET 10 (`net10.0-windows`, WinForms)
+- `WH_KEYBOARD_LL` (low-level keyboard hook)
+- OSC по UDP
+- REAPER Action IDs
+
+## Быстрый старт
+
+1. Соберите проект:
+
+```powershell
+dotnet build -c Release
+```
+
+2. Запустите `KeyVolumeBridge.exe`.
+3. Убедитесь, что в трее появилась иконка приложения.
+4. Настройте REAPER на приём OSC (см. ниже).
+
+## Настройка REAPER (OSC)
+
+В REAPER:
+
+1. `Options -> Preferences -> Control/OSC/web`
+2. `Add -> OSC (Open Sound Control)`
+3. Укажите **Local listen port** (должен совпадать с `osc.port` в конфиге).
+4. Используйте стандартный pattern, где поддерживается `/action/<id>` (обычно `Default.ReaperOSC` или совместимый).
+
+Пример: если в конфиге `port = 8000`, REAPER тоже должен слушать `8000`.
+
+## Конфиг приложения
+
+Файл:
+
+- `KeyVolumeBridge.config.json` (лежит рядом с `.exe`)
+
+Пример:
+
+```json
+{
+  "osc": {
+    "host": "127.0.0.1",
+    "port": 8000
+  },
+  "commands": {
+    "volumeUp": 40108,
+    "volumeDown": 40107,
+    "mute": {
+      "singleClick": 40730,
+      "doubleClickExtra": 0,
+      "tripleClickExtra": 0
+    }
+  },
+  "click": {
+    "muteWindowMs": 325
+  }
+}
+```
+
+### Пояснения
+
+- `commands.volumeUp` — команда для `Volume Up`
+- `commands.volumeDown` — команда для `Volume Down`
+- `commands.mute.singleClick` — команда для одиночного клика `Mute`
+- `commands.mute.doubleClickExtra` — доп. команда для двойного клика `Mute`
+- `commands.mute.tripleClickExtra` — доп. команда для тройного клика `Mute`
+- `click.muteWindowMs` — окно распознавания двойного/тройного клика (мс)
+
+`0` означает “не отправлять дополнительную команду”.
+
+## Где взять Command ID в REAPER
+
+1. Откройте `Actions -> Show action list...`
+2. Найдите нужное действие
+3. Возьмите числовой `Command ID`
+4. Вставьте его в `KeyVolumeBridge.config.json`
+
+## Иконки
+
+Папка:
+
+- `KeyVolumeBridge/Assets`
+
+Файлы:
+
+- `app.ico` — иконка самого `.exe`
+- `tray.ico` — иконка в трее
+
+Если `tray.ico` отсутствует, используется `app.ico`, затем системная иконка.
+
+## Управление через трей
+
+- Статус работы
+- OSC host/port
+- Последнее событие
+- Открытие папки конфига
+- Включение/выключение автозапуска Windows
+- Выход
+
+## Ограничения и примечания
+
+- Приложение рассчитано на Windows.
+- Команды отправляются только если процесс `reaper.exe` запущен.
+- Если OSC недоступен, приложение автоматически пытается переподключиться в фоне.
+
+---
+
+Если нужно, можно добавить portable-режим, лог-файл и экспорт/импорт нескольких профилей команд.
